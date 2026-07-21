@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Round — join a circle</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..700&family=Space+Mono:wght@400;700&family=Work+Sans:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/src/theme.css" />
+  </head>
+  <body>
+    <div class="page">
+      <header>
+        <p class="eyebrow">Round — a shared savings circle</p>
+        <h1 class="headline">Join this circle</h1>
+        <p class="sub">You've been invited to a shared savings circle. Review the terms, then join.</p>
+      </header>
+
+      <div id="broken-link-notice" class="notice notice--error" hidden>
+        This link is missing or broken — ask whoever shared it for a new one.
+      </div>
+
+      <div id="join-content" hidden>
+        <div class="ring-card">
+          <svg id="rotation-ring" viewBox="0 0 200 200" role="img" aria-label="Rotation preview"></svg>
+        </div>
+
+        <dl class="ledger" id="terms-list"></dl>
+
+        <p class="error" id="join-error" role="alert"></p>
+
+        <button id="join-btn" class="stamp-btn" type="button">Join circle</button>
+      </div>
+
+      <p class="footer-link"><a href="/">&larr; back to Round</a></p>
+    </div>
+
+    <script type="module" src="/src/join-main.ts"></script>
+  </body>
+</html>

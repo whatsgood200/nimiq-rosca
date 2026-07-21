@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+# Version-independent safety net: blocks any commit that stages a secret.
+# This is your real guard against committing the EVM deployer private key or .env.
+# INSTALL:
+#   cp git-pre-commit .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit
+# Also add to .gitignore:  .env  .env.*  *.pem  *keypair*  *mnemonic*
+
+staged=$(git diff --cached --name-only)
+
+# 1) Block secret-looking filenames — but allow committed templates
+# (.example / .sample suffix), since those are meant to be tracked.
+if echo "$staged" | grep -viE '\.(example|sample)$' | grep -qiE '(^|/)\.env($|\.)|keypair|mnemonic|secret|id_rsa|\.pem$'; then
+  echo "BLOCKED: a staged file looks like a secret (.env / keypair / mnemonic / .pem)."
+  echo "Remove it from the commit and add it to .gitignore."
+  exit 1
+fi
+
+# 2) Block secret-looking assignments in staged content (private key / mnemonic / seed phrase)
+if git diff --cached -U0 | grep -qiE '(private[_-]?key|mnemonic|seed[_-]?phrase)[[:space:]]*[:=][[:space:]]*["'\'']?(0x)?[a-fA-F0-9]{40,}'; then
+  echo "BLOCKED: staged content contains what looks like a private key or mnemonic assignment."
+  echo "Move it to an untracked .env and reference it via environment variables."
+  exit 1
+fi
+
+exit 0

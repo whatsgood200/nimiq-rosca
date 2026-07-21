@@ -1,0 +1,17 @@
+{
+  "_comment": "Claude Code project settings. The PreToolUse hook blocks obviously dangerous or secret-exposing bash before it runs. Hook input arrives as JSON on stdin; we grep the raw payload so it works regardless of the exact schema. If a future Claude Code version changes hook wiring, confirm against the current hooks docs.",
+
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "payload=$(cat); if echo \"$payload\" | grep -qiE 'rm -rf (/|~|\\.\\.)|:(){ :|:& };:|cat[^|]*\\.env|git add[^&|]*\\.env|(PRIVATE_KEY|MNEMONIC|SEED_PHRASE)=|>[[:space:]]*\\.env'; then echo 'BLOCKED by guard: command touches secrets or is destructive. Review it yourself before running.'; exit 1; fi; exit 0"
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Round — create your circle</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..700&family=Space+Mono:wght@400;700&family=Work+Sans:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/src/theme.css" />
+  </head>
+  <body>
+    <div class="page">
+      <header>
+        <p class="eyebrow">Round — a shared savings circle</p>
+        <h1 class="headline">Create your circle</h1>
+        <p class="sub">
+          Everyone contributes the same amount each round. The pot turns to one member at a time —
+          no organizer holds the money.
+        </p>
+      </header>
+
+      <div class="ring-card">
+        <svg id="rotation-ring" viewBox="0 0 200 200" role="img" aria-label="Rotation preview"></svg>
+      </div>
+
+      <section id="create-form-section">
+        <form id="create-form" novalidate>
+          <div class="field">
+            <label for="circle-name">Circle name</label>
+            <input id="circle-name" type="text" placeholder="Family Savings" autocomplete="off" />
+            <p class="error" id="name-error" role="alert"></p>
+          </div>
+
+          <div class="field-row">
+            <div class="field" style="margin-bottom: 0;">
+              <label for="contribution-amount">Contribution / round</label>
+              <input id="contribution-amount" type="number" inputmode="decimal" min="0" step="0.01" placeholder="50" />
+            </div>
+            <div class="field field-currency" style="margin-bottom: 0;">
+              <label for="currency">Currency</label>
+              <select id="currency">
+                <option value="USDT" selected>USDT</option>
+                <option value="NIM">NIM</option>
+              </select>
+            </div>
+          </div>
+          <p class="error" id="amount-error" role="alert"></p>
+
+          <div class="field">
+            <label for="member-count">Members</label>
+            <input id="member-count" type="number" inputmode="numeric" min="2" step="1" placeholder="6" />
+            <p class="error" id="member-error" role="alert"></p>
+          </div>
+
+          <p class="pot-preview" id="pot-preview" aria-live="polite"></p>
+
+          <button type="submit" class="stamp-btn" id="create-btn">Create circle</button>
+          <p class="hint" id="deploy-status" role="status" aria-live="polite" hidden></p>
+        </form>
+      </section>
+
+      <section id="summary-section" hidden>
+        <div class="stamp-seal" id="stamp-seal">CIRCLE<br />CREATED</div>
+        <dl class="ledger" id="summary-list"></dl>
+
+        <div id="invite-section">
+          <label for="invite-link">Invite link</label>
+          <div class="invite-field">
+            <input id="invite-link" type="text" readonly />
+            <button id="copy-link-btn" class="copy-btn" type="button">Copy</button>
+          </div>
+        </div>
+
+        <a href="/ledger.html" class="stamp-btn">View ledger &rarr;</a>
+        <button id="start-over-btn" class="link-btn" type="button">Void this entry — start over</button>
+      </section>
+
+      <p class="footer-link"><a href="/spike.html">Gate 1 diagnostics &rarr;</a></p>
+    </div>
+
+    <script type="module" src="/src/create-circle-main.ts"></script>
+  </body>
+</html>

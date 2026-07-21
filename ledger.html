@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Round — ledger</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..700&family=Space+Mono:wght@400;700&family=Work+Sans:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/src/theme.css" />
+  </head>
+  <body>
+    <div class="page">
+      <header>
+        <p class="eyebrow">Round — a shared savings circle</p>
+        <h1 class="headline">Ledger</h1>
+        <p class="sub">Everyone sees the same round, the same payments, the same turn.</p>
+      </header>
+
+      <div id="no-circle-notice" class="notice notice--error" hidden>
+        You're not part of a circle on this device yet — <a href="/">create or join one</a>.
+      </div>
+
+      <div id="ledger-content" hidden>
+        <div class="ring-card">
+          <svg id="rotation-ring" viewBox="0 0 200 200" role="img" aria-label="Round progress"></svg>
+        </div>
+
+        <dl class="ledger" id="round-list"></dl>
+
+        <p class="eyebrow" style="margin-top: 1.75rem;">Members</p>
+        <dl class="ledger" id="members-list"></dl>
+
+        <p class="error" id="action-error" role="alert"></p>
+
+        <button id="contribute-btn" class="stamp-btn" type="button">Contribute</button>
+        <button id="refund-btn" class="link-btn" type="button" hidden>Refund my contribution</button>
+      </div>
+
+      <p class="footer-link"><a href="/">&larr; back to Round</a></p>
+    </div>
+
+    <script type="module" src="/src/ledger-main.ts"></script>
+  </body>
+</html>
