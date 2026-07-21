@@ -1,11 +1,15 @@
 import { BrowserProvider, Contract, ContractFactory, MaxUint256, type Eip1193Provider } from 'ethers';
 import {
+  AMOY_CHAIN_ID,
+  AMOY_TOKEN_ADDRESS,
   DEFAULT_ROUND_DURATION_SECONDS,
   ERC20_ABI,
+  LOCAL_CHAIN_ID,
   LOCAL_TOKEN_ADDRESS,
   ROSCA_ABI,
   ROSCA_BYTECODE,
 } from './contract-config';
+import { ensureAmoyChain } from './polygon-check';
 
 export interface CircleState {
   /** Members who have actually joined so far — may be fewer than memberCount. */
@@ -35,11 +39,31 @@ function getProvider(): BrowserProvider {
   return new BrowserProvider(window.ethereum as unknown as Eip1193Provider);
 }
 
-/** Reads the local token's decimals, so the create-circle form can convert a
- * human-entered amount into the right smallest-unit integer before deploying. */
+/** Which deployed token address to use for the wallet's *actual* connected
+ * network — this is the fix for the phone bug where the app called
+ * decimals()/deployed a circle against LOCAL_TOKEN_ADDRESS (a Hardhat local
+ * node address) while the real wallet was on Polygon Amoy, where no contract
+ * exists at that address (BAD_DATA on any call). Amoy is the only real
+ * network this app supports, so anything that isn't already the local dev
+ * network or Amoy gets a switch prompt before resolving. */
+async function resolveTokenAddress(provider: BrowserProvider): Promise<string> {
+  const network = await provider.getNetwork();
+  const chainId = Number(network.chainId);
+
+  if (chainId === LOCAL_CHAIN_ID) return LOCAL_TOKEN_ADDRESS;
+  if (chainId === AMOY_CHAIN_ID) return AMOY_TOKEN_ADDRESS;
+
+  await ensureAmoyChain();
+  return AMOY_TOKEN_ADDRESS;
+}
+
+/** Reads the connected network's token decimals, so the create-circle form
+ * can convert a human-entered amount into the right smallest-unit integer
+ * before deploying. */
 export async function getTokenDecimals(): Promise<number> {
   const provider = getProvider();
-  const token = new Contract(LOCAL_TOKEN_ADDRESS, ERC20_ABI, provider);
+  const tokenAddress = await resolveTokenAddress(provider);
+  const token = new Contract(tokenAddress, ERC20_ABI, provider);
   return Number(await token.decimals());
 }
 
@@ -54,10 +78,14 @@ export async function deployCircle(params: {
   contributionAmount: bigint;
   memberCount: number;
 }): Promise<string> {
-  const signer = await getSigner();
+  const provider = getProvider();
+  await provider.send('eth_requestAccounts', []);
+  const signer = await provider.getSigner();
+  const tokenAddress = await resolveTokenAddress(provider);
+
   const factory = new ContractFactory(ROSCA_ABI, ROSCA_BYTECODE, signer);
   const contract = await factory.deploy(
-    LOCAL_TOKEN_ADDRESS,
+    tokenAddress,
     params.contributionAmount,
     params.memberCount,
     DEFAULT_ROUND_DURATION_SECONDS,

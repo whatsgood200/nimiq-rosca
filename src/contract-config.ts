@@ -1,8 +1,13 @@
-// Local-network config for the Gate 2 integration. This is exactly where the
-// swap to real Polygon Amoy happens later: LOCAL_CHAIN_ID -> 80002 and
-// LOCAL_TOKEN_ADDRESS -> the real USDT-on-Amoy contract address.
+// Local-network config, for dev against `npx hardhat node` (see contracts/README.md).
 export const LOCAL_CHAIN_ID = 31337;
 export const LOCAL_TOKEN_ADDRESS = '0x5FbDB2315678afecb367f032d93F642f64180aa3';
+
+// Real Polygon Amoy testnet — what the app actually runs against on a phone.
+// MockERC20 (6-decimal mUSDT stand-in; Amoy has no easy-to-get real testnet
+// USDT) deployed via contracts/ignition/modules/RoscaCircle.ts — see
+// contracts/README.md for the deployment tx and Polygonscan links.
+export const AMOY_CHAIN_ID = 80002;
+export const AMOY_TOKEN_ADDRESS = '0x9c457A45c5B2912c71c40A3f2c03b84A55bE832f';
 
 /** Not exposed as a form field yet — see plan notes. */
 export const DEFAULT_ROUND_DURATION_SECONDS = 7 * 24 * 60 * 60; // 7 days

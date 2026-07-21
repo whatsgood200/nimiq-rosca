@@ -1,15 +1,58 @@
-const POLYGON_AMOY_CHAIN_ID = '0x13882'; // 80002
+import { AMOY_CHAIN_ID } from './contract-config';
+
+const POLYGON_AMOY_CHAIN_ID = `0x${AMOY_CHAIN_ID.toString(16)}`; // 0x13882
 
 const POLYGON_AMOY_CHAIN_PARAMS = {
   chainId: POLYGON_AMOY_CHAIN_ID,
   chainName: 'Polygon Amoy Testnet',
   nativeCurrency: { name: 'POL', symbol: 'POL', decimals: 18 },
-  rpcUrls: ['https://rpc-amoy.polygon.technology'],
+  // Reliable public endpoint — the official rpc-amoy.polygon.technology did
+  // not respond at all when checked (see contracts/README.md); publicnode did.
+  rpcUrls: ['https://polygon-amoy-bor-rpc.publicnode.com'],
   blockExplorerUrls: ['https://amoy.polygonscan.com'],
 };
 
 function isEthereumProviderError(err: unknown): err is EthereumProviderError {
   return typeof err === 'object' && err !== null && 'code' in err;
+}
+
+/**
+ * Gets the wallet onto Polygon Amoy, prompting a switch (and an add, if the
+ * wallet doesn't know the chain yet) when it isn't already there. Throws with
+ * a message safe to surface to the user if it can't get there — callers that
+ * need Amoy for a contract call (rosca-contract.ts) should await this before
+ * resolving addresses or sending transactions.
+ */
+export async function ensureAmoyChain(): Promise<void> {
+  if (!window.ethereum) {
+    throw new Error('No wallet found — window.ethereum is unavailable.');
+  }
+
+  const currentChainId = await window.ethereum.request({ method: 'eth_chainId' });
+  if (currentChainId === POLYGON_AMOY_CHAIN_ID) return;
+
+  try {
+    await window.ethereum.request({
+      method: 'wallet_switchEthereumChain',
+      params: [{ chainId: POLYGON_AMOY_CHAIN_ID }],
+    });
+  } catch (err) {
+    if (isEthereumProviderError(err) && err.code === 4902) {
+      await window.ethereum.request({
+        method: 'wallet_addEthereumChain',
+        params: [POLYGON_AMOY_CHAIN_PARAMS],
+      });
+    } else if (isEthereumProviderError(err)) {
+      throw new Error(`Could not switch your wallet to Polygon Amoy — code ${err.code}: ${err.message}`);
+    } else {
+      throw err;
+    }
+  }
+
+  const chainIdAfter = await window.ethereum.request({ method: 'eth_chainId' });
+  if (chainIdAfter !== POLYGON_AMOY_CHAIN_ID) {
+    throw new Error(`Wallet did not switch to Polygon Amoy — still on chainId ${String(chainIdAfter)}.`);
+  }
 }
 
 /**
