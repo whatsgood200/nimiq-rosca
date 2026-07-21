@@ -75,6 +75,15 @@ professional at a glance, native on mobile, zero-to-using in under 60 seconds. N
      device to confirm which field it actually lands in.
   3. Joining a NIM circle costs the joiner a small real amount of NIM (0.01, the join-marker
      transaction) — unlike USDT's free `join()` call. Minor, but worth having in the demo script.
+- **Real Amoy deploy is confirmed working** (RoscaCircle `0x9ec0a17199c8246402cbCFF8f5439EF39bc0D737`,
+  MockERC20 `0x9c457A45c5B2912c71c40A3f2c03b84A55bE832f` — see `contracts/README.md` for tx links).
+  Gas learning from that run: whichever member's `contribute()` call happens to be the *last* one
+  in a round costs noticeably more gas than a plain `contribute()`, because that same call also
+  triggers `_payout()` (pot transfer + round bookkeeping, and on the final round `CircleCompleted`)
+  in one transaction. A wallet funded only for an ordinary `contribute()` can revert with
+  `insufficient funds for intrinsic transaction cost` if it happens to be the one closing out a
+  round — budget gas headroom for the payout-triggering case, not just the average case, anywhere
+  members get funded for a demo (scripts here, or eventually frontend UX copy about expected fees).
 
 ## Verification loop
 - Never accept "it works" — require the tx hash / on-phone confirmation.
